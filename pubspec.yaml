@@ -1,0 +1,32 @@
+name: ventadeasientos
+description: "Aplicación Flutter para recomendación inteligente de asientos de cine"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.7.2 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  sqflite: ^2.3.2
+  path: ^1.9.0
+  intl: ^0.19.0 # ¡Añade esta línea!
+  flutter_localizations: # ¡Añade esta línea!
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/avengers.jpg
+    - assets/spiderman.jpg
+    - assets/batman.jpg
+    - assets/dune.jpg
+    - assets/topgun.jpg
