@@ -1,4 +1,3 @@
-// lib/screens/historial_screen.dart
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
@@ -80,24 +79,7 @@ class _HistorialScreenState extends State<HistorialScreen>
               fecha TEXT
             )
           ''');
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS usuarios (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre TEXT,
-              correo TEXT UNIQUE,
-              contrasena TEXT,
-              rol TEXT
-            )
-          ''');
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS asientos_ocupados (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              pelicula TEXT NOT NULL,
-              fecha TEXT NOT NULL,
-              asiento_id TEXT NOT NULL,
-              UNIQUE(pelicula, fecha, asiento_id) ON CONFLICT IGNORE
-            )
-          ''');
+          // CORRECCIÓN: Eliminadas las creaciones duplicadas de usuarios y asientos_ocupados aquí
         },
         version: 4, // ¡Versión consistente con PurchaseScreen y LoginScreen!
         onUpgrade: (db, oldVersion, newVersion) async {

@@ -53,12 +53,31 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleLogin() async {
     setState(() => _isLoading = true);
-    final usuario = await DBHelper.loginUsuario(
-      emailController.text,
-      passwordController.text,
-    );
-    await Future.delayed(Duration(milliseconds: 800));
-    setState(() => _isLoading = false);
+    Map<String, dynamic>?
+    usuario; // Se declara aquí para que sea accesible fuera del try-catch
+    try {
+      usuario = await DBHelper.loginUsuario(
+        emailController.text,
+        passwordController.text,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al intentar iniciar sesión: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Login Error: $e'); // Para depuración
+    } finally {
+      await Future.delayed(
+        Duration(milliseconds: 800),
+      ); // Simula un retraso para la carga
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
 
     if (!mounted) return;
     if (usuario != null) {
@@ -66,16 +85,19 @@ class _LoginScreenState extends State<LoginScreen>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => HistorialScreen(usuarioCorreo: usuario['correo']),
+            builder: (_) => HistorialScreen(usuarioCorreo: usuario!['correo']),
           ),
         );
       } else {
+        // CAMBIO CLAVE: Pasar el objeto 'usuario' a MovieListScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => MovieListScreen(usuario: usuario)),
         );
       }
     } else {
+      // Esta parte solo se ejecutará si 'usuario' es nulo DESPUÉS de un intento de login
+      // (sin excepción), o si la excepción ya fue manejada.
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Credenciales inválidas')));
@@ -166,7 +188,9 @@ class _LoginScreenState extends State<LoginScreen>
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    // Puedes añadir la lógica para recuperar contraseña aquí
+                                  },
                                   child: Text(
                                     '¿Olvidaste tu contraseña?',
                                     style: TextStyle(

@@ -1,4 +1,4 @@
-#Tue Jun 17 00:04:47 BOT 2025
+#Tue Jun 17 16:19:04 BOT 2025
 base.0=/home/cj/Documentos/Universidad/Compra_de_boletos/ventadeasientos/build/app/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/home/cj/Documentos/Universidad/Compra_de_boletos/ventadeasientos/build/app/intermediates/dex/debug/mergeLibDexDebug/0/classes.dex
 base.2=/home/cj/Documentos/Universidad/Compra_de_boletos/ventadeasientos/build/app/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex

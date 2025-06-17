@@ -1,6 +1,5 @@
-// lib/screens/purchase_screen.dart
 import 'package:flutter/material.dart';
-import 'movie_list_screen.dart'; // Make sure this path is correct
+import 'movie_list_screen.dart'; // Asegúrate de que esta ruta sea correcta
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:math';
@@ -42,11 +41,13 @@ class PurchaseScreen extends StatefulWidget {
   final String movieTitle;
   final String imagePath;
   final String? userEmail; // Optional: Pass user email for purchase data
+  final Map<String, dynamic>? usuario; // AÑADIDO: Para persistir el usuario
 
   const PurchaseScreen({
     required this.movieTitle,
     required this.imagePath,
     this.userEmail,
+    this.usuario, // AÑADIDO: Para persistir el usuario
     Key? key,
   }) : super(key: key);
 
@@ -378,7 +379,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Total: \$${seleccionados.length * 150} MXN",
+                            "Total: \$${seleccionados.length * 40} BS",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -472,7 +473,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                                 tempFechaFuncion == null
                                     ? 'Seleccionar fecha de función'
                                     : DateFormat(
-                                      'dd/MM/yyyy',
+                                      'dd/MM/yyyy', // CORREGIDO: Formato de fecha con año
                                     ).format(tempFechaFuncion!),
                                 style: TextStyle(
                                   color:
@@ -585,10 +586,13 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                         ),
                       );
 
-                      // Navigate back to movie list, ensuring it's still mounted
+                      // Navega de vuelta a la lista de películas, PASANDO EL USUARIO ACTUAL
                       Navigator.pushAndRemoveUntil(
                         ctx,
-                        MaterialPageRoute(builder: (_) => MovieListScreen()),
+                        MaterialPageRoute(
+                          builder:
+                              (_) => MovieListScreen(usuario: widget.usuario),
+                        ), // CAMBIO CLAVE AQUÍ
                         (route) => false,
                       );
                     }
@@ -816,7 +820,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              DateFormat('dd MMMM yyyy').format(_selectedDate),
+                              DateFormat('dd MMMM yyyy').format(
+                                _selectedDate,
+                              ), // CORREGIDO: Formato de fecha con año
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -879,85 +885,57 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                 ],
               ),
             ),
-
-            // Legend
+            const SizedBox(height: 16),
             _buildLeyenda(),
-
-            // Screen Display
             _buildPantalla(),
-
-            // Seats Grid
             Expanded(
-              child: Container(
+              child: GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: columnas,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: asientos.length,
-                  itemBuilder: (context, index) {
-                    final a = asientos[index];
-                    return GestureDetector(
-                      onTap: () {
-                        if (!a.ocupado) {
-                          if (mounted) {
-                            // Check mounted before setState
-                            setState(() {
-                              a.seleccionado = !a.seleccionado;
-                              // Clear recommendations when a seat is manually selected
-                              if (a.seleccionado) {
-                                recomendados.clear();
-                              }
-                            });
-                          }
-                        }
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: _colorAsiento(a),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow:
-                              a.seleccionado
-                                  ? [
-                                    BoxShadow(
-                                      color: _colorAsiento(a).withOpacity(0.4),
-                                      spreadRadius: 2,
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                  : null,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _iconoAsiento(a),
-                              color: Colors.white,
-                              size: 16,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columnas,
+                  childAspectRatio: 1.0,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: asientos.length,
+                itemBuilder: (context, index) {
+                  final asiento = asientos[index];
+                  return GestureDetector(
+                    onTap: () {
+                      if (!asiento.ocupado) {
+                        setState(() {
+                          asiento.seleccionado = !asiento.seleccionado;
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "El asiento ${asiento.id} ya está ocupado",
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              a.id, // Use the Asiento's ID
-                              style: TextStyle(
-                                color:
-                                    a.ocupado ? Colors.white54 : Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 10,
-                              ),
+                            backgroundColor: Colors.red,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ],
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _colorAsiento(asiento),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          _iconoAsiento(asiento),
+                          color: Colors.white,
+                          size: 20,
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ],

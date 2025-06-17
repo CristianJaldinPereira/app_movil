@@ -1,4 +1,3 @@
-// lib/screens/movie_list_screen.dart
 import 'package:flutter/material.dart';
 import 'purchase_screen.dart'; // Asegúrate de que esta ruta sea correcta
 import 'historial_screen.dart'; // Importa HistorialScreen para la navegación
@@ -120,11 +119,9 @@ class MovieListScreen extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
                     onTap: () async {
-                      // <-- ¡Añadido 'async' aquí!
                       // Navegar a PurchaseScreen y esperar el resultado.
                       // Esto no necesita devolver un resultado específico si HistorialScreen ya se recarga en initState.
                       await Navigator.push(
-                        // <-- ¡Añadido 'await' aquí!
                         context,
                         MaterialPageRoute(
                           builder:
@@ -132,6 +129,8 @@ class MovieListScreen extends StatelessWidget {
                                 movieTitle: pelicula.title,
                                 imagePath: pelicula.image,
                                 userEmail: correoUsuario,
+                                usuario:
+                                    usuario, // CAMBIO CLAVE: Pasar el objeto usuario
                               ),
                         ),
                       );
